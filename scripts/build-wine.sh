@@ -21,6 +21,9 @@ BUNDLE_RES="${BUNDLE_CONTENTS}/Resources"
 BUNDLE_MACOS="${BUNDLE_CONTENTS}/MacOS"
 DESTROOT="${STAGEDIR}/destroot"
 ARTIFACT="${WORKSPACE}/winecx-${VERSION}-osx64.tar.gz"
+LICENSE_OUT="${WORKSPACE}/COPYING.LIB"
+SOURCE_NOTICE="${WORKSPACE}/WINECX_SOURCE.md"
+THIRD_PARTY_NOTICES="${WORKSPACE}/THIRD_PARTY_NOTICES.md"
 
 group()    { echo "::group::$1"; }
 endgroup() { echo "::endgroup::"; }
@@ -37,6 +40,44 @@ rm -rf "${WORKDIR}"
 mkdir -p "${WORKDIR}"
 tar -xzf "${TARBALL}" -C "${WORKDIR}"
 test -x "${WORKDIR}/sources/wine/configure"
+test -f "${WORKDIR}/sources/wine/COPYING.LIB"
+endgroup
+
+group "Prepare license and source notices"
+cp "${WORKDIR}/sources/wine/COPYING.LIB" "${LICENSE_OUT}"
+cat > "${SOURCE_NOTICE}" <<EOF
+# WineCX ${VERSION} Source Information
+
+This release contains Wine-derived binaries built from the CrossOver source archive for version ${VERSION}.
+
+## Binary Artifact
+
+- winecx-${VERSION}-osx64.tar.gz
+
+## Corresponding Source
+
+- Source archive used by this build: ${SOURCE_URL}
+- Source archive attached to this release: crossover-sources-${VERSION}.tar.gz
+- Build scripts and workflow: https://github.com/m5kro/winecx-dist
+- Build script path: scripts/build-wine.sh
+- GitHub Actions workflow path: .github/workflows/build.yml
+
+## License
+
+Wine-derived components are distributed under the GNU Lesser General Public License, version 2.1 or later, plus any additional license notices included in the upstream source archive.
+
+The LGPL license text from the source archive is included as COPYING.LIB.
+
+## Build Summary
+
+The build downloads crossover-sources-${VERSION}.tar.gz, extracts sources/wine, configures Wine for macOS with i386 and x86_64 support, builds with the Homebrew toolchain, stages the Wine install into a macOS .app bundle, and packages the bundle as winecx-${VERSION}-osx64.tar.gz.
+
+See scripts/build-wine.sh for exact configure flags and commands.
+
+## Trademark Notice
+
+WineCX Distributables is not affiliated with, sponsored by, or endorsed by CodeWeavers. CrossOver is a CodeWeavers product/mark.
+EOF
 endgroup
 
 group "Configure environment"
@@ -117,6 +158,11 @@ EOF
 chmod +x "${BUNDLE_MACOS}/wine"
 cp "${SCRIPTDIR}/bundle/PkgInfo" "${BUNDLE_CONTENTS}/PkgInfo"
 sed "s/@VERSION@/${VERSION}/g" "${SCRIPTDIR}/bundle/Info.plist.in" > "${BUNDLE_CONTENTS}/Info.plist"
+cp "${LICENSE_OUT}" "${BUNDLE_RES}/COPYING.LIB"
+cp "${SOURCE_NOTICE}" "${BUNDLE_RES}/WINECX_SOURCE.md"
+if [[ -f "${THIRD_PARTY_NOTICES}" ]]; then
+    cp "${THIRD_PARTY_NOTICES}" "${BUNDLE_RES}/THIRD_PARTY_NOTICES.md"
+fi
 codesign --force --deep --sign - "${APPDIR}"
 endgroup
 

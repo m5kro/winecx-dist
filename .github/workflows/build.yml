@@ -31,5 +31,16 @@ jobs:
         with:
           tag_name: v${{ inputs.version }}
           name: winecx ${{ inputs.version }}
-          files: winecx-${{ inputs.version }}-osx64.tar.gz
+          body: |
+            Prebuilt macOS WineCX app bundle built from the CrossOver source archive for version ${{ inputs.version }}.
+
+            This release includes the corresponding source archive, LGPL license text, third-party notices, and version-specific source/build information.
+
+            WineCX Distributables is not affiliated with, sponsored by, or endorsed by CodeWeavers. CrossOver is a CodeWeavers product/mark.
+          files: |
+            winecx-${{ inputs.version }}-osx64.tar.gz
+            crossover-sources-${{ inputs.version }}.tar.gz
+            COPYING.LIB
+            THIRD_PARTY_NOTICES.md
+            WINECX_SOURCE.md
           fail_on_unmatched_files: true

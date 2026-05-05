@@ -2,6 +2,8 @@
 
 Prebuilt macOS binaries of Wine based on CrossOver sources from CodeWeavers.
 
+WineCX Distributables is not affiliated with, sponsored by, or endorsed by CodeWeavers. CrossOver is a CodeWeavers product/mark.
+
 ## What this is
 
 A GitHub Actions workflow that downloads CrossOver source tarballs, builds Wine from them on an Intel macOS runner, and publishes the result as a GitHub release.
@@ -15,6 +17,8 @@ tar -xzf winecx-<version>-osx64.tar.gz -C "$HOME/Library/Application Support/her
 ```
 
 The bundle contains `Contents/Resources/wine/{bin,lib,share}` with the full wine install and a `Contents/MacOS/wine` symlink to `Resources/wine/bin/wine` for macOS `.app` conventions.
+
+See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for licensing and source details.
 
 ## Building a release
 
